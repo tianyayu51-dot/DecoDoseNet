@@ -1,26 +1,24 @@
-# DecoDoseNet
+# DecoDoseNet Code
 
-Code and data for dose-specific drug combination response prediction with DecoDoseNet, a dual-branch model combining an Interpretable Decoupling Branch (IDB) and a High-Performance Prediction Branch (HPB).
+This archive contains notebooks for DecoDoseNet experiments and the corresponding input data.
 
 ## Notebooks
 
 | File | Description |
 | --- | --- |
-| `01_Graphlet_ABG_5seeds.ipynb` | Trains and evaluates DecoDoseNet across five random seeds (42, 52, 62, 72, and 82). Each run independently splits the data into training, validation, and test sets using disjoint drug-pair–cell-line groups. Saves model checkpoints, test predictions, split assignments, and evaluation metrics, with a summary of the mean and sample standard deviation across runs. |
-| `02_Graphlet_ABG_drug_pair_cold_start.ipynb` | Evaluates generalization to unseen drug pairs using seed 42. Splits the data by unordered drug pair so that training, validation, and test sets contain mutually exclusive pairs. Saves split checks, model checkpoints, test predictions, and evaluation metrics. |
-| `03_Graphlet_ABG_cell_line_cold_start.ipynb` | Evaluates generalization to unseen cell lines using seed 42. Splits the data by cell line so that training, validation, and test sets contain mutually exclusive cell lines. Saves split checks, model checkpoints, test predictions, and evaluation metrics. |
-| `04_Graphlet_ABG_IDB_component_ablation.ipynb` | Evaluates the contributions of the IDB components using a fixed group-disjoint split and seed 42. Compares the full model with three variants: removing the learned residual term epsilon, fixing both single-agent weights to 0.5, and applying both changes together. Saves model checkpoints, predictions, and comparative metrics. |
+| `01_Graphlet_ABG_5seeds_.ipynb` | Repeated group-disjoint training and evaluation across five seeds (42, 52, 62, 72, 82); summarizes test metrics. The notebook reads an existing seed-42 prediction file and trains the remaining seeds by default. |
+| `02_2Graphlet_ABG_seed_42.ipynb` | Trains and evaluates the full model with a group-disjoint train/validation/test split at seed 42; saves predictions and the trained model. |
+| `03_3Graphlet_ABG_ablation.ipynb` | Compares separately trained IDB-only and HPB-only variants at seed 42. |
+| `04_Graphlet_ABG_IDB_component_ablation.ipynb` | Evaluates IDB component variants without ε, with fixed drug weights, and with both changes. |
+| `05_DecoDoseNet_cold_start_cell_line.ipynb` | Leave-one-cell-line-out evaluation: each cell line is held out for testing in its own fold. |
+| `05_DecoDoseNet_cold_start_drug_pair.ipynb` | Leave-one-unordered-drug-pair-out evaluation: each drug pair is held out for testing in its own fold. |
 
-## Data files
-
-The following files are included in `DecoDoseNet_data/`.
+## Data (`DecoDoseNet_data/`)
 
 | File | Description |
 | --- | --- |
-| `cell_features_977d.csv` | Cell-line gene expression features. Contains a `Cell_Line` identifier column and 977 gene feature columns. |
-| `Graphlet_features_6_standardized.csv` | Drug graphlet features. Contains 6,890 numeric feature columns and the metadata columns `name`, `smile`, and `mol`. |
-| `processed_combination_response_r070_clean_with_qc.csv` | Processed drug combination response data with quality-control fields. Includes drug and cell-line identifiers, paired concentrations, combination response targets, fitted single-agent responses, four-parameter logistic fit parameters, and fit-quality metrics. |
+| `processed_combination_response_r070_clean_with_qc.csv` | Processed dose-specific combination responses after monotherapy fit quality control at the R² ≥ 0.70 threshold. |
+| `Graphlet_features_6_standardized.csv` | Standardized graphlet-based drug features. |
+| `cell_features_977d.csv` | Cell-line feature table with 977 expression features. |
 
-## Data path
-
-The notebooks currently use `DATA_DIR = Path("data")`. To use the included folder, change this setting to `DATA_DIR = Path("DecoDoseNet_data")` and run the notebooks from the `DecoDoseNet_Code/` directory, or rename `DecoDoseNet_data/` to `data/`.
+**Data paths:** The two cold-start notebooks expect these three CSV files in `data/` relative to the notebook working directory. The other notebooks use an absolute `DATA_DIR` path. Set `DATA_DIR` to the extracted `DecoDoseNet_data/` directory (or copy the data to the expected location) before running them. The five-seed notebook additionally expects an existing seed-42 prediction CSV at `EXISTING_SEED42_PREDICTIONS` unless its configuration is changed.
